@@ -11,10 +11,12 @@ use tui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
-    widgets::{Block, Borders, Cell, Row, Table, TableState},
+    text::{Span, Spans, Text},
+    widgets::{Block, Borders, Cell, Paragraph, Row, Table, TableState},
     Terminal,
 };
 
+const HELP_TEXT: &str = "   Tab to switch sources. Up and down to navigate. Q to exit.";
 static NORMAL_STYLE: Lazy<Style> = Lazy::new(|| Style::default().bg(Color::Blue));
 static SELECTED_STYLE: Lazy<Style> =
     Lazy::new(|| Style::default().add_modifier(Modifier::REVERSED));
@@ -126,6 +128,34 @@ impl App {
     fn current_table_state(&mut self) -> &mut TableState {
         &mut self.table_states[self.tab_index]
     }
+
+    fn tab_header(&self) -> Vec<Span> {
+        let active = Style::default()
+            .bg(Color::LightGreen)
+            .fg(Color::Black)
+            .add_modifier(Modifier::BOLD);
+        let inactive = Style::default();
+        vec![
+            Span::raw("   "),
+            Span::styled(
+                "Pilots",
+                if self.tab_index == 0 {
+                    active
+                } else {
+                    inactive
+                },
+            ),
+            Span::raw("  <->  "),
+            Span::styled(
+                "Controllers",
+                if self.tab_index == 1 {
+                    active
+                } else {
+                    inactive
+                },
+            ),
+        ]
+    }
 }
 
 pub fn run(data: V3ResponseData) -> Result<()> {
@@ -147,13 +177,26 @@ pub fn run(data: V3ResponseData) -> Result<()> {
         let _ = terminal.draw(|f| {
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
-                .margin(1)
+                .horizontal_margin(1)
                 .constraints([Constraint::Length(3), Constraint::Min(0)].as_ref())
                 .split(f.size());
 
+            let title_chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([
+                    Constraint::Length(32),
+                    Constraint::Min(1),
+                    Constraint::Length((HELP_TEXT.len() + 4).try_into().unwrap()),
+                ])
+                .split(chunks[0]);
+
+            let tab_header = Paragraph::new(vec![Spans::from(app.tab_header())])
+                .block(Block::default().borders(Borders::ALL).title("Data sources"));
+            f.render_widget(tab_header, title_chunks[0]);
             f.render_widget(
-                Block::default().borders(Borders::ALL).title("Data sources"),
-                chunks[0],
+                Paragraph::new(Text::from(HELP_TEXT))
+                    .block(Block::default().borders(Borders::ALL).title("Help")),
+                title_chunks[2],
             );
 
             let headers = app.get_headers();
