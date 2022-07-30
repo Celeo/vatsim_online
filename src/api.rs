@@ -53,7 +53,11 @@ impl Vatsim {
                 response.status().as_u16()
             ));
         }
-        let data = response.json()?;
+        let mut data: V3ResponseData = response.json()?;
+        data.pilots
+            .sort_by(|a, b| a.name.partial_cmp(&b.name).unwrap());
+        data.controllers
+            .sort_by(|a, b| a.name.partial_cmp(&b.name).unwrap());
         Ok(data)
     }
 

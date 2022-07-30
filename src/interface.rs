@@ -47,9 +47,9 @@ impl App {
     fn down(&mut self) {
         let sel = self.table_states[self.tab_index].selected().unwrap_or(0);
         let length = if self.tab_index == 0 {
-            self.data.controllers.len()
-        } else {
             self.data.pilots.len()
+        } else {
+            self.data.controllers.len()
         };
         let next = if sel >= length - 1 { 0 } else { sel + 1 };
         self.table_states[self.tab_index].select(Some(next));
@@ -58,9 +58,9 @@ impl App {
     fn up(&mut self) {
         let sel = self.table_states[self.tab_index].selected().unwrap_or(0);
         let length = if self.tab_index == 0 {
-            self.data.controllers.len()
-        } else {
             self.data.pilots.len()
+        } else {
+            self.data.controllers.len()
         };
         let next = if sel == 0 { length - 1 } else { sel - 1 };
         self.table_states[self.tab_index].select(Some(next));
@@ -78,9 +78,9 @@ impl App {
                         pilot.flight_plan.as_ref().map_or_else(
                             || String::from("???"),
                             |fp| {
-                                if fp.aircraft_faa.is_empty() {
+                                if !fp.aircraft_faa.is_empty() {
                                     fp.aircraft_faa.clone()
-                                } else if fp.aircraft_short.is_empty() {
+                                } else if !fp.aircraft_short.is_empty() {
                                     fp.aircraft_short.clone()
                                 } else {
                                     String::from("???")
