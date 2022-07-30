@@ -132,10 +132,6 @@ pub fn run(data: V3ResponseData) -> Result<()> {
 
     loop {
         let _ = terminal.draw(|f| {
-            // f.render_widget(
-            //     Block::default().style(Style::default().fg(Color::Black).bg(Color::White)),
-            //     f.size(),
-            // );
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
                 .margin(1)
@@ -161,6 +157,13 @@ pub fn run(data: V3ResponseData) -> Result<()> {
                         .borders(Borders::ALL)
                         .title(app.get_selected_title()),
                 )
+                .widths(&[
+                    Constraint::Percentage(20),
+                    Constraint::Percentage(20),
+                    Constraint::Percentage(20),
+                    Constraint::Percentage(20),
+                ])
+                .column_spacing(1)
                 .highlight_style(*SELECTED_STYLE)
                 .highlight_symbol(">> ");
             f.render_stateful_widget(table, chunks[1], &mut app.current_table_state());
