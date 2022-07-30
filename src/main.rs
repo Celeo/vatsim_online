@@ -11,10 +11,12 @@
     unused_results
 )]
 
-use api::Vatsim;
-
 mod api;
+mod interface;
 mod models;
+
+use anyhow::Result;
+use api::Vatsim;
 
 fn setup_logger() -> Result<(), fern::InitError> {
     fern::Dispatch::new()
@@ -35,7 +37,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
 
 fn main() {
     setup_logger().expect("Could not configure logger");
-    let vatsim = Vatsim::new().expect("Could not set up access to VATSim API");
-    let data = vatsim.get_data().expect("Could not get VATSim data");
-    // TODO
+    let vatsim = Vatsim::new().expect("Could not set up access to VATSIM API");
+    let data = vatsim.get_data().expect("Could not get VATSIM data");
+    interface::run(data).expect("Could not set up interface");
 }

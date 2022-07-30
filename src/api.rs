@@ -13,7 +13,7 @@ pub struct Vatsim {
 
 impl Vatsim {
     pub fn new() -> Result<Self> {
-        debug!("Creating Vatsim struct instance");
+        debug!("Creating VATSIM struct instance");
         let client = ClientBuilder::new()
             .user_agent("github.com/celeo/vatsim_online")
             .build()?;
