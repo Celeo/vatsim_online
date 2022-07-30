@@ -1,6 +1,6 @@
 # vatsim_online
 
-[![CI](https://github.com/Celeo/vatsim-online/workflows/CI/badge.svg?branch=master)](https://github.com/celeo/vatsim-online/actions?query=workflow%3ACI)
+[![CI](https://github.com/Celeo/vatsim_online/workflows/CI/badge.svg?branch=master)](https://github.com/celeo/vatsim_online/actions?query=workflow%3ACI)
 
 TUI to get basic information for users on VATSIM
 
