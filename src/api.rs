@@ -56,4 +56,12 @@ impl Vatsim {
         let data = response.json()?;
         Ok(data)
     }
+
+    pub fn controller_rating_lookup(data: &V3ResponseData, rating: i8) -> String {
+        data.ratings
+            .iter()
+            .find(|&item| item.id == rating)
+            .map(|item| item.short.clone())
+            .unwrap_or(String::from("?"))
+    }
 }

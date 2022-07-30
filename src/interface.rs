@@ -1,4 +1,4 @@
-use crate::models::V3ResponseData;
+use crate::{api::Vatsim, models::V3ResponseData};
 use anyhow::Result;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
@@ -73,6 +73,19 @@ impl App {
                     vec![
                         pilot.name.clone(),
                         pilot.callsign.clone(),
+                        pilot
+                            .flight_plan
+                            .as_ref()
+                            .map(|fp| {
+                                if fp.aircraft_faa.len() > 0 {
+                                    fp.aircraft_faa.clone()
+                                } else if fp.aircraft_short.len() > 0 {
+                                    fp.aircraft_short.clone()
+                                } else {
+                                    String::from("???")
+                                }
+                            })
+                            .unwrap_or(String::from("???")),
                         pilot.latitude.to_string(),
                         pilot.longitude.to_string(),
                     ]
@@ -87,7 +100,7 @@ impl App {
                         controller.name.clone(),
                         controller.callsign.clone(),
                         controller.frequency.clone(),
-                        controller.rating.to_string(), // TODO look up in table rather than bitmask
+                        Vatsim::controller_rating_lookup(&self.data, controller.rating),
                     ]
                 })
                 .collect()
@@ -96,7 +109,7 @@ impl App {
 
     fn get_headers(&self) -> Vec<&'static str> {
         if self.tab_index == 0 {
-            vec!["Name", "Callsign", "Lat", "Long"]
+            vec!["Name", "Callsign", "Aircraft", "Lat", "Long"]
         } else {
             vec!["Name", "Callsign", "Frequency", "Rating"]
         }
@@ -158,12 +171,11 @@ pub fn run(data: V3ResponseData) -> Result<()> {
                         .title(app.get_selected_title()),
                 )
                 .widths(&[
-                    Constraint::Percentage(20),
-                    Constraint::Percentage(20),
-                    Constraint::Percentage(20),
-                    Constraint::Percentage(20),
+                    Constraint::Percentage(25),
+                    Constraint::Percentage(25),
+                    Constraint::Percentage(25),
+                    Constraint::Percentage(25),
                 ])
-                .column_spacing(1)
                 .highlight_style(*SELECTED_STYLE)
                 .highlight_symbol(">> ");
             f.render_stateful_widget(table, chunks[1], &mut app.current_table_state());

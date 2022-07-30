@@ -42,7 +42,7 @@ pub struct Pilot {
     pub name: String,
     pub callsign: String,
     pub server: String,
-    pub pilot_rating: i64,
+    pub pilot_rating: i8,
     pub latitude: f64,
     pub longitude: f64,
     pub altitude: i64,
@@ -63,7 +63,7 @@ pub struct Controller {
     pub callsign: String,
     pub frequency: String,
     pub facility: i64,
-    pub rating: i64,
+    pub rating: i8,
     pub server: String,
     pub visual_range: i64,
     pub text_atis: Option<Vec<String>>,
@@ -82,13 +82,20 @@ pub struct GeneralData {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct ReferenceItem {
+    pub id: i8,
+    pub short: String,
+    pub long: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct V3ResponseData {
     pub general: GeneralData,
     pub pilots: Vec<Pilot>,
     pub controllers: Vec<Controller>,
     // atis: Vec<?>,
     // servers: Vec<?>,
-    // facilities: Vec<?>,
-    // ratings: Vec<?>,
+    pub facilities: Vec<ReferenceItem>,
+    pub ratings: Vec<ReferenceItem>,
     // pilot_ratings: Vec<?>,
 }
