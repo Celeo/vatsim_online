@@ -17,6 +17,17 @@ mod models;
 
 use anyhow::Result;
 use api::Vatsim;
+use clap::Parser;
+
+const LOG_FILE_NAME: &str = "vatsim_online.log";
+
+#[derive(Debug, Parser)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+    /// Enable debug logging to a 'vatsim_online.log' file
+    #[clap(short, long)]
+    debug: bool,
+}
 
 fn setup_logger() -> Result<(), fern::InitError> {
     fern::Dispatch::new()
@@ -30,13 +41,16 @@ fn setup_logger() -> Result<(), fern::InitError> {
         })
         .level(log::LevelFilter::Info)
         .level_for("vatsim_online", log::LevelFilter::Debug)
-        .chain(fern::log_file("output.log")?)
+        .chain(fern::log_file(LOG_FILE_NAME)?)
         .apply()?;
     Ok(())
 }
 
 fn main() {
-    setup_logger().expect("Could not configure logger");
+    let args = Args::parse();
+    if args.debug {
+        setup_logger().expect("Could not configure logger");
+    }
     let vatsim = Vatsim::new().expect("Could not set up access to VATSIM API");
     let data = vatsim.get_data().expect("Could not get VATSIM data");
     interface::run(data).expect("Could not set up interface");
