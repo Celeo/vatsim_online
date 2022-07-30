@@ -37,7 +37,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
                 chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
                 record.level(),
                 message
-            ))
+            ));
         })
         .level(log::LevelFilter::Info)
         .level_for("vatsim_online", log::LevelFilter::Debug)

@@ -38,8 +38,8 @@ impl Vatsim {
             .data
             .v3
             .choose(&mut rand::thread_rng())
-            .ok_or(anyhow!("No V3 URLs returned"))?
-            .to_owned();
+            .ok_or_else(|| anyhow!("No V3 URLs returned"))?
+            .clone();
         debug!("V3 URL: {}", url);
         Ok(url)
     }
@@ -61,7 +61,6 @@ impl Vatsim {
         data.ratings
             .iter()
             .find(|&item| item.id == rating)
-            .map(|item| item.short.clone())
-            .unwrap_or(String::from("?"))
+            .map_or_else(|| String::from("?"), |item| item.short.clone())
     }
 }

@@ -75,19 +75,18 @@ impl App {
                     vec![
                         pilot.name.clone(),
                         pilot.callsign.clone(),
-                        pilot
-                            .flight_plan
-                            .as_ref()
-                            .map(|fp| {
-                                if fp.aircraft_faa.len() > 0 {
+                        pilot.flight_plan.as_ref().map_or_else(
+                            || String::from("???"),
+                            |fp| {
+                                if fp.aircraft_faa.is_empty() {
                                     fp.aircraft_faa.clone()
-                                } else if fp.aircraft_short.len() > 0 {
+                                } else if fp.aircraft_short.is_empty() {
                                     fp.aircraft_short.clone()
                                 } else {
                                     String::from("???")
                                 }
-                            })
-                            .unwrap_or(String::from("???")),
+                            },
+                        ),
                         pilot.latitude.to_string(),
                         pilot.longitude.to_string(),
                     ]
@@ -221,7 +220,7 @@ pub fn run(data: V3ResponseData) -> Result<()> {
                 ])
                 .highlight_style(*SELECTED_STYLE)
                 .highlight_symbol(">> ");
-            f.render_stateful_widget(table, chunks[1], &mut app.current_table_state());
+            f.render_stateful_widget(table, chunks[1], app.current_table_state());
         })?;
 
         if let Event::Key(key) = event::read()? {
