@@ -15,7 +15,7 @@ use tui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Spans, Text},
-    widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Widget, Wrap},
+    widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Wrap},
     Terminal,
 };
 
@@ -29,6 +29,7 @@ static SELECTED_STYLE: Lazy<Style> =
     Lazy::new(|| Style::default().add_modifier(Modifier::REVERSED));
 
 /// Run the terminal interface.
+#[allow(clippy::too_many_lines)]
 pub fn run(data: V3ResponseData) -> Result<()> {
     debug!(
         "interface::run, {} pilots, {} controllers",
@@ -113,27 +114,27 @@ pub fn run(data: V3ResponseData) -> Result<()> {
                 KeyCode::Char('q') => break,
                 KeyCode::Down => {
                     if !view_data.show_popup {
-                        app.down()
+                        app.down();
                     }
                 }
                 KeyCode::Up => {
                     if !view_data.show_popup {
-                        app.up()
+                        app.up();
                     }
                 }
                 KeyCode::Tab => {
                     if !view_data.show_popup {
-                        app.tab_over()
+                        app.tab_over();
                     }
                 }
                 KeyCode::PageDown => {
                     if !view_data.show_popup {
-                        app.page_down()
+                        app.page_down();
                     }
                 }
                 KeyCode::PageUp => {
                     if !view_data.show_popup {
-                        app.page_up()
+                        app.page_up();
                     }
                 }
                 KeyCode::Enter => app.toggle_popup(true),

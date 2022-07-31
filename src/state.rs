@@ -19,6 +19,7 @@ pub struct ViewData {
 
 /// The data for a selected row in the interface.
 #[derive(Debug, Clone)]
+#[allow(clippy::large_enum_variant)]
 pub enum SelectedRow {
     Pilot(Pilot),
     Controller(Controller),
