@@ -14,6 +14,7 @@
 mod api;
 mod interface;
 mod models;
+mod state;
 
 use anyhow::Result;
 use api::Vatsim;
