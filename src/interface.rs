@@ -66,6 +66,27 @@ impl App {
         self.table_states[self.tab_index].select(Some(next));
     }
 
+    fn page_down(&mut self) {
+        let sel = self.table_states[self.tab_index].selected().unwrap_or(0);
+        let length = if self.tab_index == 0 {
+            self.data.pilots.len()
+        } else {
+            self.data.controllers.len()
+        };
+        let next = if sel + 10 >= length {
+            length - 1
+        } else {
+            sel + 10
+        };
+        self.table_states[self.tab_index].select(Some(next));
+    }
+
+    fn page_up(&mut self) {
+        let sel = self.table_states[self.tab_index].selected().unwrap_or(0);
+        let next = if sel <= 10 { 0 } else { sel - 10 };
+        self.table_states[self.tab_index].select(Some(next));
+    }
+
     fn get_tab_data(&self) -> Vec<Vec<String>> {
         if self.tab_index == 0 {
             self.data
@@ -229,6 +250,8 @@ pub fn run(data: V3ResponseData) -> Result<()> {
                 KeyCode::Down => app.down(),
                 KeyCode::Up => app.up(),
                 KeyCode::Tab => app.tab_over(),
+                KeyCode::PageDown => app.page_down(),
+                KeyCode::PageUp => app.page_up(),
                 _ => {}
             }
         }
