@@ -206,7 +206,7 @@ pub fn run(data: V3ResponseData) -> Result<()> {
                 .constraints([
                     Constraint::Length(32),
                     Constraint::Min(1),
-                    Constraint::Length((HELP_TEXT.len() + 4).try_into().unwrap()),
+                    Constraint::Length((HELP_TEXT.len() + 5).try_into().unwrap()),
                 ])
                 .split(chunks[0]);
 
