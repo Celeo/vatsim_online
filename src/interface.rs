@@ -16,18 +16,25 @@ use tui::{
     Terminal,
 };
 
-const HELP_TEXT: &str = "   Tab to switch sources. Up and down to navigate. Q to exit.";
+/// Text shown in the top right.
+const HELP_TEXT: &str =
+    "   Tab to switch sources. Up and down to navigate. Enter to examine; Esc to close. Q to exit.";
+/// Style applied to the table header row.
 static NORMAL_STYLE: Lazy<Style> = Lazy::new(|| Style::default().bg(Color::Blue));
+/// Style applied to non-header table rows.
 static SELECTED_STYLE: Lazy<Style> =
     Lazy::new(|| Style::default().add_modifier(Modifier::REVERSED));
 
+/// State of the interface.
 struct App {
     tab_index: usize,
     table_states: [TableState; 2],
     data: V3ResponseData,
+    show_popup: bool,
 }
 
 impl App {
+    /// Create a new interface state from the VATSIM V3 data.
     fn new(data: V3ResponseData) -> Self {
         let mut state = TableState::default();
         state.select(Some(0));
@@ -35,15 +42,20 @@ impl App {
             tab_index: 0,
             table_states: [state.clone(), state.clone()],
             data,
+            show_popup: false,
         }
     }
 
+    /// Switch between the pilots and controllers data in the table.
+    ///
+    /// Effectively the "Tabs" component from tui, just manual.
     fn tab_over(&mut self) {
         self.tab_index = if self.tab_index == 0 { 1 } else { 0 };
         self.table_states[0].select(Some(0));
         self.table_states[1].select(Some(0));
     }
 
+    /// Scroll down the table. Wrap-around supported.
     fn down(&mut self) {
         let sel = self.table_states[self.tab_index].selected().unwrap_or(0);
         let length = if self.tab_index == 0 {
@@ -55,6 +67,7 @@ impl App {
         self.table_states[self.tab_index].select(Some(next));
     }
 
+    /// Scroll up the table. Wrap-around supported.
     fn up(&mut self) {
         let sel = self.table_states[self.tab_index].selected().unwrap_or(0);
         let length = if self.tab_index == 0 {
@@ -66,6 +79,7 @@ impl App {
         self.table_states[self.tab_index].select(Some(next));
     }
 
+    /// Scroll down 10 to the button. No wrap-around.
     fn page_down(&mut self) {
         let sel = self.table_states[self.tab_index].selected().unwrap_or(0);
         let length = if self.tab_index == 0 {
@@ -81,12 +95,19 @@ impl App {
         self.table_states[self.tab_index].select(Some(next));
     }
 
+    /// Scroll up 10 to the top. No wrap-around.
     fn page_up(&mut self) {
         let sel = self.table_states[self.tab_index].selected().unwrap_or(0);
         let next = if sel <= 10 { 0 } else { sel - 10 };
         self.table_states[self.tab_index].select(Some(next));
     }
 
+    /// Toggle the inspection popup on a table row.
+    fn toggle_popup(&mut self, open: bool) {
+        self.show_popup = open;
+    }
+
+    /// Get data from the selected "tab" for the table.
     fn get_tab_data(&self) -> Vec<Vec<String>> {
         if self.tab_index == 0 {
             self.data
@@ -129,6 +150,7 @@ impl App {
         }
     }
 
+    /// Get table headers for the selected "tab".
     fn get_headers(&self) -> Vec<&'static str> {
         if self.tab_index == 0 {
             vec!["Name", "Callsign", "Aircraft", "Lat", "Long"]
@@ -137,6 +159,7 @@ impl App {
         }
     }
 
+    /// Get the table border title for the selected "tab".
     fn get_selected_title(&self) -> &'static str {
         if self.tab_index == 0 {
             "Pilots"
@@ -145,10 +168,12 @@ impl App {
         }
     }
 
+    /// Get the current "tab"'s `TableState` as a mutable reference.
     fn current_table_state(&mut self) -> &mut TableState {
         &mut self.table_states[self.tab_index]
     }
 
+    /// Construct the "tab" selector.
     fn tab_header(&self) -> Vec<Span> {
         let active = Style::default()
             .bg(Color::LightGreen)
@@ -178,6 +203,7 @@ impl App {
     }
 }
 
+/// Run the terminal interface.
 pub fn run(data: V3ResponseData) -> Result<()> {
     debug!(
         "interface::run, {} pilots, {} controllers",
@@ -185,6 +211,7 @@ pub fn run(data: V3ResponseData) -> Result<()> {
         data.controllers.len()
     );
 
+    // configure terminal
     let mut stdout = std::io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
@@ -195,12 +222,14 @@ pub fn run(data: V3ResponseData) -> Result<()> {
 
     loop {
         let _ = terminal.draw(|f| {
+            // general layout
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
                 .horizontal_margin(1)
                 .constraints([Constraint::Length(3), Constraint::Min(0)].as_ref())
                 .split(f.size());
 
+            // "title row" layout
             let title_chunks = Layout::default()
                 .direction(Direction::Horizontal)
                 .constraints([
@@ -210,6 +239,7 @@ pub fn run(data: V3ResponseData) -> Result<()> {
                 ])
                 .split(chunks[0]);
 
+            // data sources switcher and help text
             let tab_header = Paragraph::new(vec![Spans::from(app.tab_header())])
                 .block(Block::default().borders(Borders::ALL).title("Data sources"));
             f.render_widget(tab_header, title_chunks[0]);
@@ -219,6 +249,7 @@ pub fn run(data: V3ResponseData) -> Result<()> {
                 title_chunks[2],
             );
 
+            // table
             let headers = app.get_headers();
             let header_cells = headers.iter().map(|&h| Cell::from(h));
             let header = Row::new(header_cells).style(*NORMAL_STYLE).height(1);
@@ -242,21 +273,28 @@ pub fn run(data: V3ResponseData) -> Result<()> {
                 .highlight_style(*SELECTED_STYLE)
                 .highlight_symbol(">> ");
             f.render_stateful_widget(table, chunks[1], app.current_table_state());
+
+            // popup
+            // TODO
         })?;
 
+        // key press handlers
         if let Event::Key(key) = event::read()? {
             match key.code {
-                KeyCode::Char('q') | KeyCode::Esc => break,
+                KeyCode::Char('q') => break,
                 KeyCode::Down => app.down(),
                 KeyCode::Up => app.up(),
                 KeyCode::Tab => app.tab_over(),
                 KeyCode::PageDown => app.page_down(),
                 KeyCode::PageUp => app.page_up(),
+                KeyCode::Enter => app.toggle_popup(true),
+                KeyCode::Esc => app.toggle_popup(false),
                 _ => {}
             }
         }
     }
 
+    // exit, restore terminal
     disable_raw_mode()?;
     execute!(
         terminal.backend_mut(),

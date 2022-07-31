@@ -29,6 +29,7 @@ struct Args {
     debug: bool,
 }
 
+/// Configure the debug file logger.
 fn setup_logger() -> Result<(), fern::InitError> {
     fern::Dispatch::new()
         .format(|out, message, record| {
@@ -46,6 +47,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
     Ok(())
 }
 
+/// Entry point.
 fn main() {
     let args = Args::parse();
     if args.debug {
