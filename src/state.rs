@@ -103,8 +103,8 @@ impl App {
                 .iter()
                 .map(|pilot| {
                     vec![
-                        pilot.name.clone(),
                         pilot.callsign.clone(),
+                        pilot.name.clone(),
                         pilot.flight_plan.as_ref().map_or_else(
                             || String::from("???"),
                             |fp| {
@@ -128,8 +128,8 @@ impl App {
                 .iter()
                 .map(|controller| {
                     vec![
-                        controller.name.clone(),
                         controller.callsign.clone(),
+                        controller.name.clone(),
                         controller.frequency.clone(),
                         Vatsim::controller_rating_lookup(&self.data, controller.rating),
                     ]
@@ -141,9 +141,9 @@ impl App {
     /// Get table headers for the selected "tab".
     fn get_headers(&self) -> Vec<&'static str> {
         if self.tab_index == 0 {
-            vec!["Name", "Callsign", "Aircraft", "Lat", "Long"]
+            vec!["Callsign", "Name", "Aircraft", "Lat", "Long"]
         } else {
-            vec!["Name", "Callsign", "Frequency", "Rating"]
+            vec!["Callsign", "Name", "Frequency", "Rating"]
         }
     }
 

@@ -63,9 +63,9 @@ impl Vatsim {
         }
         let mut data: V3ResponseData = response.json()?;
         data.pilots
-            .sort_by(|a, b| a.name.partial_cmp(&b.name).unwrap());
+            .sort_by(|a, b| a.callsign.partial_cmp(&b.callsign).unwrap());
         data.controllers
-            .sort_by(|a, b| a.name.partial_cmp(&b.name).unwrap());
+            .sort_by(|a, b| a.callsign.partial_cmp(&b.callsign).unwrap());
         Ok(data)
     }
 
