@@ -1,4 +1,7 @@
-use crate::{api::Vatsim, models::V3ResponseData};
+use crate::{
+    api::Vatsim,
+    models::{Controller, Pilot, V3ResponseData},
+};
 use tui::{
     style::{Color, Modifier, Style},
     text::Span,
@@ -11,6 +14,14 @@ pub struct ViewData {
     pub headers: Vec<&'static str>,
     pub data: Vec<Vec<String>>,
     pub show_popup: bool,
+    pub selected_row_data: SelectedRow,
+}
+
+/// The data for a selected row in the interface.
+#[derive(Debug, Clone)]
+pub enum SelectedRow {
+    Pilot(Pilot),
+    Controller(Controller),
 }
 
 /// State of the interface.
@@ -163,6 +174,7 @@ impl App {
             headers: self.get_headers(),
             data: self.get_tab_data(),
             show_popup: self.show_popup,
+            selected_row_data: self.get_selected_row_data(),
         }
     }
 
@@ -198,5 +210,15 @@ impl App {
                 },
             ),
         ]
+    }
+
+    /// Get the currently selected row's data.
+    fn get_selected_row_data(&self) -> SelectedRow {
+        let row = self.table_states[self.tab_index].selected().unwrap_or(0);
+        if self.tab_index == 0 {
+            SelectedRow::Pilot(self.data.pilots.get(row).unwrap().clone())
+        } else {
+            SelectedRow::Controller(self.data.controllers.get(row).unwrap().clone())
+        }
     }
 }

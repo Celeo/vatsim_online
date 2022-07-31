@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct StatusData {
     pub v3: Vec<String>,
     pub transceivers: Vec<String>,
@@ -11,14 +11,14 @@ pub struct StatusData {
     pub servers_all: Vec<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Status {
     pub data: StatusData,
     pub user: Vec<String>,
     pub metar: Vec<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FlightPlan {
     pub flight_rules: String,
     pub aircraft: String,
@@ -38,7 +38,7 @@ pub struct FlightPlan {
     pub assigned_transponder: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Pilot {
     pub cid: i64,
     pub name: String,
@@ -58,7 +58,7 @@ pub struct Pilot {
     pub last_updated: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Controller {
     pub cid: i64,
     pub name: String,
@@ -73,7 +73,7 @@ pub struct Controller {
     pub logon_time: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GeneralData {
     pub version: i64,
     pub reload: i64,
@@ -83,14 +83,14 @@ pub struct GeneralData {
     pub unique_users: i64,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ReferenceItem {
     pub id: i8,
     pub short: String,
     pub long: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct V3ResponseData {
     pub general: GeneralData,
     pub pilots: Vec<Pilot>,
