@@ -4,6 +4,8 @@
 
 TUI to get basic information for users on VATSIM
 
+![screenshot](./screenshot.png)
+
 ## Building
 
 1. Install Rust
